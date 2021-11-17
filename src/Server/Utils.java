@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class Utils {
     public static byte[] encrypt(byte[] bytes, Key key) throws Exception {
         try {
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return cipher.doFinal(bytes);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
@@ -25,7 +25,7 @@ public class Utils {
 
     public static byte[] decrypt(byte[] bytes, Key key) throws InvalidKeyException, Exception{
         try{
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, key);
             return cipher.doFinal(bytes);
         } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException e) {

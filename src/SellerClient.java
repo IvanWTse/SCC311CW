@@ -7,8 +7,9 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.ObjectInputStream;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.security.InvalidKeyException;
@@ -25,7 +26,7 @@ public class SellerClient {
         String userName = null;
         Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("RSA");
+            cipher = Cipher.getInstance("AES");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace();
             return;
@@ -37,8 +38,10 @@ public class SellerClient {
             userName = s.nextLine();
             register = (IRegister) Naming.lookup("rmi://127.0.0.1:6666/register");
             seller = (ISeller) Naming.lookup("rmi://127.0.0.1:6666/seller");
-            clientKey = register.register(userName);
-            System.out.printf("\nThe username is %s. Your public key is %s. \n", userName, Arrays.toString(clientKey.getEncoded()));
+//            clientKey = register.register(userName);
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("secretKey"));
+            clientKey = (Key) ois.readObject();
+            System.out.printf("\nThe username is %s. Your key is %s. \n", userName, Arrays.toString(clientKey.getEncoded()));
         } catch (Exception e) {
             e.printStackTrace();
             return;
