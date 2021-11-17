@@ -39,7 +39,7 @@ public class Register extends UnicastRemoteObject implements IRegister {
     }
 
     @Override
-    public byte[] proveClient(String username) {
+    public byte[] proveClient(String username) throws RemoteException{
         byte[] bytes = new byte[20];
         SecureRandom random = new SecureRandom();
         random.nextBytes(bytes);
@@ -48,7 +48,7 @@ public class Register extends UnicastRemoteObject implements IRegister {
     }
 
     @Override
-    public boolean clientChallengeBack(String username, byte[] encryptedChallenge) {
+    public boolean clientChallengeBack(String username, byte[] encryptedChallenge) throws RemoteException{
         try {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, MainServer.key);

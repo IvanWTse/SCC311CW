@@ -2,6 +2,7 @@ import Prototype.AuctionItem;
 import Prototype.IRegister;
 import Prototype.ISeller;
 import Prototype.Requests;
+import Server.MainServer;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -15,16 +16,36 @@ import java.rmi.RemoteException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class SellerClient {
+    private static void verify(IRegister register, String username) throws Exception {
+        SecureRandom random = new SecureRandom();
+        byte[] challenge = new byte[20];
+        Cipher cipher = Cipher.getInstance("AES");
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("secretKey"));
+        Key key = (Key) ois.readObject();
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        random.nextBytes(challenge);
+        byte[] challengeBack = register.proveServer(challenge);
+        if (!Arrays.equals(challenge, cipher.doFinal(challengeBack))) {
+            throw new Exception("Failed at verification to server");
+        }
+        challenge = register.proveClient(username);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        if(!register.clientChallengeBack(username, cipher.doFinal(challenge))){
+            throw new Exception("Failed to do client verification");
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         Key clientKey;
         ISeller seller;
         IRegister register;
-        String userName = null;
-        Cipher cipher = null;
+        String userName;
+        Cipher cipher;
         try {
             cipher = Cipher.getInstance("AES");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
@@ -38,7 +59,7 @@ public class SellerClient {
             userName = s.nextLine();
             register = (IRegister) Naming.lookup("rmi://127.0.0.1:6666/register");
             seller = (ISeller) Naming.lookup("rmi://127.0.0.1:6666/seller");
-//            clientKey = register.register(userName);
+            verify(register, userName);
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("secretKey"));
             clientKey = (Key) ois.readObject();
             System.out.printf("\nThe username is %s. Your key is %s. \n", userName, Arrays.toString(clientKey.getEncoded()));

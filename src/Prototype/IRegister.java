@@ -2,6 +2,7 @@ package Prototype;
 
 import javax.crypto.SealedObject;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.security.Key;
 
 public interface IRegister extends Remote {
@@ -9,9 +10,9 @@ public interface IRegister extends Remote {
 
     byte[] proveServer(byte[] challenge) throws Exception;
 
-    byte[] proveClient(String username);
+    byte[] proveClient(String username) throws RemoteException;
 
-    boolean clientChallengeBack(String user, byte[] encryptedChallenge);
+    boolean clientChallengeBack(String user, byte[] encryptedChallenge) throws RemoteException;
 
     SealedObject getKey(String username) throws Exception;
 }

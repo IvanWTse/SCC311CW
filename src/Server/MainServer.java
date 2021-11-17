@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class MainServer {
@@ -26,6 +27,7 @@ public class MainServer {
         try (FileInputStream fis = new FileInputStream("secretKey")) {
             ObjectInputStream ois = new ObjectInputStream(fis);
             key = (Key) ois.readObject();
+            System.out.println(Arrays.toString(key.getEncoded()));
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             throw new RemoteException();
